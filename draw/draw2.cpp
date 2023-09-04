@@ -560,7 +560,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	std::vector<Osoba> static pasazer;
 	Osoba pas;
 	std::wstring outputString;
-	ULONGLONG ktory_tick = 0;
+	ULONGLONG static ktory_tick = 0;
 
 	switch (message)
 	{
