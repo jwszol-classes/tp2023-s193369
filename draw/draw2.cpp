@@ -21,6 +21,7 @@ ULONGLONG ktory_tick;
 bool w_gore = 1;
 bool stop = 1;
 bool w_ruchu = 0;
+bool raz_dodane_pietro = false;
 
 
 // buttons
@@ -60,8 +61,10 @@ class Osoba {
 		void Spawn(HWND, HDC&, PAINTSTRUCT&, RECT*, int ile_na_pietrze);
 		void Idz(HWND, HDC&, PAINTSTRUCT&, RECT*, int);
 
+		bool dodane_pietro_pasazera = false;
 		bool czy_w_windzie = false;
 		bool czy_wysiada = false;
+		bool czy_wsiada = false;
 
  		int getWspx() const {
 			return wspx;
@@ -618,7 +621,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// 	break;
 		
 		case ID_BUTTON1:
-			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setWsp(130 - 17*pietro0, 455);
 			pas.setSkad(0);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
@@ -627,7 +630,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			break;
 		case ID_BUTTON2:
-			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setWsp(130 - 17*pietro0, 455);
 			pas.setSkad(0);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
@@ -635,7 +638,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro0++;
 			break;
 		case ID_BUTTON3:
-			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setWsp(130 - 17*pietro0, 455);
 			pas.setSkad(0);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
@@ -643,7 +646,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro0++;
 			break;
 		case ID_BUTTON4:
-			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setWsp(130 - 17*pietro0, 455);
 			pas.setSkad(0);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
@@ -651,7 +654,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro0++;
 			break;
 		case ID_BUTTON5:
-			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setWsp(320 + 17*pietro1, 355);
 			pas.setSkad(1);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
@@ -659,7 +662,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro1++;
 			break;
 		case ID_BUTTON6:
-			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setWsp(320 + 17*pietro1, 355);
 			pas.setSkad(1);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
@@ -667,7 +670,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro1++;
 			break;
 		case ID_BUTTON7:
-			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setWsp(320 + 17*pietro1, 355);
 			pas.setSkad(1);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
@@ -675,7 +678,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro1++;
 			break;
 		case ID_BUTTON8:
-			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setWsp(320 + 17*pietro1, 355);
 			pas.setSkad(1);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
@@ -683,7 +686,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro1++;
 			break;
 		case ID_BUTTON9:
-			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setWsp(130 - 17*pietro2, 255);
 			pas.setSkad(2);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
@@ -691,7 +694,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro2++;
 			break;
 		case ID_BUTTON10:
-			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setWsp(130 - 17*pietro2, 255);
 			pas.setSkad(2);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
@@ -699,7 +702,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro2++;
 			break;
 		case ID_BUTTON11:
-			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setWsp(130 - 17*pietro2, 255);
 			pas.setSkad(2);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
@@ -707,7 +710,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro2++;
 			break;
 		case ID_BUTTON12:
-			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setWsp(130 - 17*pietro2, 255);
 			pas.setSkad(2);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
@@ -715,7 +718,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro2++;
 			break;
 		case ID_BUTTON13:
-			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setWsp(320 + 17*pietro3, 155);
 			pas.setSkad(3);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
@@ -723,7 +726,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro3++;
 			break;
 		case ID_BUTTON14:
-			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setWsp(320 + 17*pietro3, 155);
 			pas.setSkad(3);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
@@ -731,7 +734,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro3++;
 			break;
 		case ID_BUTTON15:
-			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setWsp(320 + 17*pietro3, 155);
 			pas.setSkad(3);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
@@ -739,7 +742,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro3++;
 			break;
 		case ID_BUTTON16:
-			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setWsp(320 + 17*pietro3, 155);
 			pas.setSkad(3);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
@@ -747,7 +750,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro3++;
 			break;
 		case ID_BUTTON17:
-			pas.setWsp(105 - 17*pietro4, 50);
+			pas.setWsp(130 - 17*pietro4, 55);
 			pas.setSkad(4);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
@@ -756,7 +759,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			break;
 		case ID_BUTTON18:
-			pas.setWsp(105 - 17*pietro4, 50);
+			pas.setWsp(130 - 17*pietro4, 55);
 			pas.setSkad(4);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
@@ -765,7 +768,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			break;
 		case ID_BUTTON19:
-			pas.setWsp(105 - 17*pietro4, 50);
+			pas.setWsp(130 - 17*pietro4, 55);
 			pas.setSkad(4);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
@@ -773,7 +776,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pietro4++;
 			break;
 		case ID_BUTTON20:
-			pas.setWsp(105 - 17*pietro4, 50);
+			pas.setWsp(130 - 17*pietro4, 55);
 			pas.setSkad(4);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
@@ -834,6 +837,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (400 - value == 100 * na_ktore[0]) {
 					stop = 1;
 					w_ruchu = 0;
+					raz_dodane_pietro = false;
 					ktory_tick = GetTickCount64();
 					na_ktore.erase(na_ktore.begin());
 				}
@@ -874,7 +878,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//OutputDebugString(outputString.c_str());           //i to wy�wietla si� z prawej na dole
 
 			if (na_ktore.size()) {
-				for (unsigned int i = 0;i < na_ktore.size();i++) {
+				for (unsigned int i = 0; i < na_ktore.size();i++) {
 					outputString = std::to_wstring(na_ktore[i]) + L" ";
 					OutputDebugString(outputString.c_str());
 				}
@@ -908,65 +912,88 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					wsiada = 1;
 					//dodałem jeden bo nie wiem czemu cos nie dzialalo 
-					if(ile_wolnych >= pietro4) ile_moze_wsiasc = pietro4+1;
+					if(ile_wolnych >= pietro4) ile_moze_wsiasc = pietro4;
 					else ile_moze_wsiasc = ile_wolnych;
+					bool podchodzenie = true;
 							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
+								if(!pasazer[i].czy_w_windzie && !pasazer[i].czy_wsiada)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
-								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 4 && ile_moze_wsiasc)
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 4 && ile_moze_wsiasc != 0)
 								{
+									pasazer[i].czy_wsiada = true;
 									pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 									ile_moze_wsiasc--;
 									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
-									{
+									{	
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[0] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
 									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[1] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
 									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[2] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
 									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[3] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
 									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[4] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
 									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[5] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
 									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[6] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
 									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[7] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro4--;
 									}
+								}
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 4 && !pasazer[i].czy_wsiada)
+								{
+									
+									if(pasazer[i].getWspx() == 130) podchodzenie = false;
+									if(podchodzenie)
+									{
+										pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+										pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
+									}
+									
 								}
 							}		
 				}
@@ -976,65 +1003,87 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				if (value == 100 && stop == 1 && pietro3) {
 					wsiada = 1;
-					if(ile_wolnych >= pietro3) ile_moze_wsiasc = pietro3+1;
+					if(ile_wolnych >= pietro3) ile_moze_wsiasc = pietro3;
 					else ile_moze_wsiasc = ile_wolnych;
+					bool podchodzenie = true;
 							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
+								if(!pasazer[i].czy_w_windzie && !pasazer[i].czy_wsiada)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
-								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 3 && ile_moze_wsiasc)
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 3 && ile_moze_wsiasc != 0)
 								{
+									pasazer[i].czy_wsiada = true;
 									pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
 									ile_moze_wsiasc--;
 									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[0] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
 									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[1] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
 									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[2] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
 									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[3] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
 									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[4] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
 									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[5] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
 									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[6] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
 									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[7] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro3--;
 									}
+								}
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 3 && !pasazer[i].czy_wsiada)
+								{
+									if(pasazer[i].getWspx() == 320) podchodzenie = false;
+									if(podchodzenie)
+									{
+										pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
+										pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
+									}
+									
 								}
 							}						
 				}
@@ -1044,65 +1093,87 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				if (value == 200 && stop == 1 && pietro2) {
 					wsiada = 1;
-					if(ile_wolnych >= pietro2) ile_moze_wsiasc = pietro2+1;
+					if(ile_wolnych >= pietro2) ile_moze_wsiasc = pietro2;
 					else ile_moze_wsiasc = ile_wolnych;
+					bool podchodzenie = true;
 							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
+								if(!pasazer[i].czy_w_windzie && !pasazer[i].czy_wsiada)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
-								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 2 && ile_moze_wsiasc)
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 2 && ile_moze_wsiasc != 0)
 								{
+									pasazer[i].czy_wsiada = true;
 									pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
 									ile_moze_wsiasc--;
 									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[0] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
 									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[1] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
 									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[2] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
 									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[3] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
 									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[4] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
 									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[5] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
 									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[6] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
 									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[7] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro2--;
 									}
+								}
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 2 && !pasazer[i].czy_wsiada)
+								{
+									if(pasazer[i].getWspx() == 130) podchodzenie = false;
+									if(podchodzenie)
+									{
+										pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+										pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
+									}
+									
 								}
 							}							
 				}
@@ -1112,65 +1183,87 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				
 				if (value == 300 && stop == 1 && pietro1) {
 					wsiada = 1;
-					if(ile_wolnych >= pietro1) ile_moze_wsiasc = pietro1+1;
+					if(ile_wolnych >= pietro1) ile_moze_wsiasc = pietro1;
 					else ile_moze_wsiasc = ile_wolnych;
+					bool podchodzenie = true;
 							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
+								if(!pasazer[i].czy_w_windzie && !pasazer[i].czy_wsiada)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
-								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 1 && ile_moze_wsiasc)
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 1 && ile_moze_wsiasc != 0)
 								{
+									pasazer[i].czy_wsiada = true;
 									pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
 									ile_moze_wsiasc--;
 									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[0] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
 									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[1] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
 									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[2] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
 									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[3] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
 									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[4] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
 									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[5] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
 									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[6] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
 									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[7] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro1--;
 									}
+								}
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 1 && !pasazer[i].czy_wsiada)
+								{
+									if(pasazer[i].getWspx() == 320) podchodzenie = false;
+									if(podchodzenie)
+									{
+										pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
+										pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
+									}
+									
 								}
 							}														
 				}
@@ -1180,67 +1273,182 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				if (value == 400 && stop == 1 && pietro0) {
 					wsiada = 1;
-					if(ile_wolnych >= pietro0) ile_moze_wsiasc = pietro0+1;
+					if(ile_wolnych >= pietro0) ile_moze_wsiasc = pietro0;
 					else ile_moze_wsiasc = ile_wolnych;
+					bool podchodzenie = true;
 							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
+								if(!pasazer[i].czy_w_windzie && !pasazer[i].czy_wsiada)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
-								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 0 && ile_moze_wsiasc)
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 0 && ile_moze_wsiasc != 0)
 								{
+									pasazer[i].czy_wsiada = true;
 									pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
 									ile_moze_wsiasc--;
 									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[0] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[1] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[2] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[3] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[4] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[5] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[6] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
 									{
+										if(pasazer[i].dodane_pietro_pasazera) na_ktore.push_back(pasazer[i].getDokad());
 										czy_zajete[7] = true;
 										pasazer[i].czy_w_windzie = true;
 										pietro0--;
 									}
 								}
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 0 && !pasazer[i].czy_wsiada)
+								{
+									if(pasazer[i].getWspx() == 130) podchodzenie = false;
+									if(podchodzenie)
+									{
+										pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+										pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
+									}
+									
+								}
 							}							
+				}
+			}
+			if(stop && !raz_dodane_pietro)
+			{
+				if(value == 0)
+				{
+					for(int i = 0; i < pasazer.size(); i++)
+					{
+						if(pasazer[i].getSkad() == 4 && !pasazer[i].czy_wsiada && !raz_dodane_pietro)
+						{
+							raz_dodane_pietro = true;
+							na_ktore.push_back(4);
+							for(int j = 0; j < pasazer.size(); j++)
+							{
+								if(pasazer[i].getSkad() == 4 && !pasazer[i].czy_wsiada && !pasazer[i].dodane_pietro_pasazera)
+								{
+									pasazer[i].dodane_pietro_pasazera = true;
+								}
+							}
+						}
+					}
+				}
+				if(value == 100)
+				{
+					for(int i = 0; i < pasazer.size(); i++)
+					{
+						if(pasazer[i].getSkad() == 3 && !pasazer[i].czy_wsiada && !raz_dodane_pietro)
+						{
+							raz_dodane_pietro = true;
+							na_ktore.push_back(3);
+							for(int j = 0; j < pasazer.size(); j++)
+							{
+								if(pasazer[i].getSkad() == 3 && !pasazer[i].czy_wsiada && !pasazer[i].dodane_pietro_pasazera)
+								{
+									pasazer[i].dodane_pietro_pasazera = true;
+								}
+							}
+						}
+					}
+				}
+				if(value == 200)
+				{
+					for(int i = 0; i < pasazer.size(); i++)
+					{
+						if(pasazer[i].getSkad() == 2 && !pasazer[i].czy_wsiada && !raz_dodane_pietro)
+						{
+							raz_dodane_pietro = true;
+							na_ktore.push_back(2);
+							for(int j = 0; j < pasazer.size(); j++)
+							{
+								if(pasazer[i].getSkad() == 2 && !pasazer[i].czy_wsiada && !pasazer[i].dodane_pietro_pasazera)
+								{
+									pasazer[i].dodane_pietro_pasazera = true;
+								}
+							}
+						}
+					}
+				}
+				if(value == 300)
+				{
+					for(int i = 0; i < pasazer.size(); i++)
+					{
+						if(pasazer[i].getSkad() == 1 && !pasazer[i].czy_wsiada && !raz_dodane_pietro)
+						{
+							raz_dodane_pietro = true;
+							na_ktore.push_back(1);
+							for(int j = 0; j < pasazer.size(); j++)
+							{
+								if(pasazer[i].getSkad() == 1 && !pasazer[i].czy_wsiada && !pasazer[i].dodane_pietro_pasazera)
+								{
+									pasazer[i].dodane_pietro_pasazera = true;
+								}
+							}
+						}
+					}
+				}
+				if(value == 0)
+				{
+					for(int i = 400; i < pasazer.size(); i++)
+					{
+						if(pasazer[i].getSkad() == 0 && !pasazer[i].czy_wsiada && !raz_dodane_pietro)
+						{
+							raz_dodane_pietro = true;
+							na_ktore.push_back(0);
+							for(int j = 0; j < pasazer.size(); j++)
+							{
+								if(pasazer[i].getSkad() == 0 && !pasazer[i].czy_wsiada && !pasazer[i].dodane_pietro_pasazera)
+								{
+									pasazer[i].dodane_pietro_pasazera = true;
+								}
+							}
+						}
+					}
 				}
 			}
 			w_windzie = 0;
@@ -1307,7 +1515,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
 							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, w_windzie);
 						}
-						if(pasazer[i].getWspx() > 450){
+						if(pasazer[i].getWspx() > 450 && pasazer[i].czy_wysiada){
 							pasazer[i].czy_w_windzie = false;
 							pasazer[i].czy_wysiada = false;
 							pasazer.erase(pasazer.begin() + i);
@@ -1368,7 +1576,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
 							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, w_windzie);
 						}
-						if(pasazer[i].getWspx() > 450){
+						if(pasazer[i].getWspx() > 450 && pasazer[i].czy_wysiada){
 							pasazer[i].czy_w_windzie = false;
 							pasazer[i].czy_wysiada = false;
 							pasazer.erase(pasazer.begin() + i);
@@ -1429,7 +1637,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
 							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, w_windzie);
 						}
-						if(pasazer[i].getWspx() < 3){
+						if(pasazer[i].getWspx() < 3 && pasazer[i].czy_wysiada){
 							pasazer[i].czy_w_windzie = false;
 							pasazer[i].czy_wysiada = false;
 							pasazer.erase(pasazer.begin() + i);
@@ -1489,7 +1697,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
 							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, w_windzie);
 						}
-						if(pasazer[i].getWspx() < 3){
+						if(pasazer[i].getWspx() < 3 && pasazer[i].czy_wysiada){
 							pasazer[i].czy_w_windzie = false;
 							pasazer[i].czy_wysiada = false;
 							pasazer.erase(pasazer.begin() + i);
@@ -1548,7 +1756,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 								pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
 								pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, w_windzie);
 							}
-							if(pasazer[i].getWspx() < 3)
+							if(pasazer[i].getWspx() < 3 && pasazer[i].czy_wysiada)
 							{
 								pasazer[i].czy_w_windzie = false;
 								pasazer[i].czy_wysiada = false;
