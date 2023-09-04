@@ -133,31 +133,15 @@ static void Paint(HWND hWnd, LPPAINTSTRUCT lpPS, HDC hdc, int w_windzie, int czy
 	HDC hdcMem;
 	HBITMAP hbmMem, hbmOld;
 	HBRUSH hbrBkGnd;
-	// Get the size of the client rectangle.
 	GetClientRect(hWnd, &rc);
-	// Create a compatible DC.
 	hdcMem = CreateCompatibleDC(lpPS->hdc);
-	// Create a bitmap big enough for our client rectangle.
 	hbmMem = CreateCompatibleBitmap(lpPS->hdc, rc.right - rc.left, rc.bottom - rc.top);
-	// Select the bitmap into the off-screen DC.
 	hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-	// Erase the background.
 	hbrBkGnd = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
 	FillRect(hdcMem, &rc, hbrBkGnd);
 	DeleteObject(hbrBkGnd);
 	MyOnPaint(hdc, w_windzie, czy_zajete, value, w_gore);
-	// Drawing goes here.
-	// HPEN hPenOld;
-	// HPEN hLinePen;
-	// COLORREF qLineColor;
-	// qLineColor = RGB(255, 0, 0);
-	// hLinePen = CreatePen(PS_SOLID, 7, qLineColor);
-	// hPenOld = (HPEN)SelectObject(hdcMem, hLinePen);
-	// SelectObject(hdcMem, hPenOld);
-	// DeleteObject(hLinePen);
-
 	BitBlt(lpPS->hdc, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, hdcMem, 0, 0, SRCCOPY);
-	// Done with off-screen bitmap and DC.
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmMem);
 	DeleteDC(hdcMem);
