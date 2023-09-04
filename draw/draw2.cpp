@@ -36,8 +36,8 @@ RECT drawArea2 = { 20, 40, 140, 95 };
 
 //do wysiadania
 RECT drawArea_pietro4 = { 20, 40, 295, 95 };
-RECT drawArea_pietro1 = { 160, 340, 450, 395 };
-RECT drawArea_pietro3 = { 160, 140, 450, 195 };
+RECT drawArea_pietro1 = { 152, 340, 450, 395 };
+RECT drawArea_pietro3 = { 152, 140, 450, 195 };
 RECT drawArea_pietro0 = { 20, 440, 295, 495 };
 RECT drawArea_pietro2 = { 20, 240, 295, 295 };
 
@@ -57,10 +57,13 @@ class Osoba {
 		int dokad;
 	public:
 		
-		void Spawn(HWND, HDC&, PAINTSTRUCT&, RECT*, int);
+		void Spawn(HWND, HDC&, PAINTSTRUCT&, RECT*, int ile_na_pietrze);
 		void Idz(HWND, HDC&, PAINTSTRUCT&, RECT*, int);
 
-		int getWspx() const {
+		bool czy_w_windzie = false;
+		bool czy_wysiada = false;
+
+ 		int getWspx() const {
 			return wspx;
 		}
 
@@ -89,60 +92,102 @@ class Osoba {
 			dokad = dokad1;
 		}
 };
-
 void Osoba::Idz(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, int w_windzie) {
 
-	InvalidateRect(hWnd, drawArea, FALSE); //tutaj zmieni³em z TRUE na FALSE ¿eby nie miga³o, ale musia³em dodaæ "gumki"
+	InvalidateRect(hWnd, drawArea, TRUE); //tutaj zmieniï¿½em z TRUE na FALSE ï¿½eby nie migaï¿½o, ale musiaï¿½em dodaï¿½ "gumki"
 	
 	hdc = BeginPaint(hWnd, &ps);
 	Graphics graphics(hdc);
 	Pen pen(Color(0, 0, 0), 2);
 	Pen pen1(Color(255, 255, 255), 2);
 	
-	//rysuje pasa¿erów
-	graphics.DrawRectangle(&pen, getWspx(), getWspy(), 25, 35);
+	//rysuje pasazerow
+	graphics.DrawRectangle(&pen, getWspx(), getWspy(), 13, 35);
 
-	//"gumki" pasa¿erów przy wsiadaniu/wysiadaniu
+	//"gumki" pasaï¿½erï¿½w przy wsiadaniu/wysiadaniu
 	graphics.DrawLine(&pen1, getWspx() - 2, getWspy()-1, getWspx() - 2, getWspy()+40);
-	graphics.DrawLine(&pen1, getWspx() + 23, getWspy() + 1, getWspx() + 23, getWspy() + 34);
+	graphics.DrawLine(&pen1, getWspx() + 11, getWspy() + 1, getWspx() + 11, getWspy() + 34);
 	graphics.DrawLine(&pen1, getWspx() + 2, getWspy() + 1, getWspx() + 2, getWspy() + 34);
-	graphics.DrawLine(&pen1, getWspx() + 27, getWspy() - 1, getWspx() + 27, getWspy() + 40);
+	graphics.DrawLine(&pen1, getWspx() + 15, getWspy() - 1, getWspx() + 15, getWspy() + 40);
 
 	EndPaint(hWnd, &ps);
 
 }
 
-void Osoba::Spawn(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, int ile_czeka) {
+void Osoba::Spawn(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, int ile_na_pietrze) {
 	
-	ile_czeka++; //tutaj zwiekszam, bo cos nie dzialalo jak bylo niezmienione
+	//ile_na_pietrze++; //tutaj zwiekszam, bo cos nie dzialalo jak bylo niezmienione
 
 	InvalidateRect(hWnd, drawArea, TRUE);
 	hdc = BeginPaint(hWnd, &ps);
 	Graphics graphics(hdc);
 	Pen pen(Color(0, 0, 0), 2);
-	for (int i = 0; i < ile_czeka; i++)
-		graphics.DrawRectangle(&pen, 110 - i*30 , 55, 25, 35); //110-i*30, rysuje na 4 pietrze odsuniete od siebie osoby (55 na tej wysokosc jest gora postaci na 4 pietrze)
+	graphics.DrawRectangle(&pen, getWspx(), getWspy(), 13, 35); //110-i*30, rysuje na 4 pietrze odsuniete od siebie osoby (55 na tej wysokosc jest gora postaci na 4 pietrze)
 	EndPaint(hWnd, &ps);									//trzeba bedzie dac tu jakies zmienne zamiast liczb, zeby nie tworzyc oddzielnych funkcji na kazde pietro
 
 }
-
-void MyOnPaint(HDC hdc, int w_windzie) 
+bool czy_zgodny_z_winda(int dokad, int skad, int w_gore)
+{
+	if(w_gore)
+	{
+		if(dokad > skad) return true;
+		else return false;
+	}
+	else
+	{
+		if(dokad < skad) return true;
+		else return false;
+	}
+}
+void MyOnPaint(HDC hdc, int w_windzie, int czy_zajete[]) 
 {
 	Graphics graphics(hdc);
 	Pen pen(Color(0, 0, 255), 4);
 	Pen pen1(Color(0, 0, 0), 2);
-	Pen pen2(Color(255, 255, 255), 2);
+	Pen pen2(Color(255, 255, 255), 6);
+	Pen pen3(Color(255, 255, 255), 6);
 	graphics.DrawRectangle(&pen, 150, value, 150, 100);
 
-	for (int i = 0; i < w_windzie; i++) {
-		//"gumki" pasa¿erów (nie wiem czy dzia³a jak jad¹ w górê)
-		graphics.DrawRectangle(&pen1, 265 - i * 30, value + 55, 25, 35);
-		graphics.DrawRectangle(&pen2, 267 - i * 30, value + 57, 21, 31);
-		//graphics.DrawLine(&pen1, getWspx() + 27, getWspy() - 1, getWspx() + 27, getWspy() + 40);
-		graphics.DrawLine(&pen2, 263 - i * 30, value + 53, 267 - i * 30 + 25, value + 53);
+	for (int i = 0; i < 8; i++) 
+	{
+		//"gumki" pasaï¿½erï¿½w (nie wiem czy dziaï¿½a jak jadï¿½ w gï¿½rï¿½)
+		if(!w_gore)
+		{
+			graphics.DrawLine(&pen2, 154 + i*18, value + 86, 172 +i*18, value + 86);
+			graphics.DrawLine(&pen3, 152, value + 51, 298, value + 51);
+		}
+		else if(w_gore)
+		{
+			graphics.DrawLine(&pen2, 154 + i*18, value + 55, 172 +i*18, value + 55);
+			graphics.DrawLine(&pen3, 152, value + 94, 298, value + 94);
+		}
+		if(czy_zajete[i]) graphics.DrawRectangle(&pen1, 154 + i*18, value + 55, 13, 35);
 	}
 	
 
+}
+static void Paint(HWND hWnd, LPPAINTSTRUCT lpPS, HDC hdc, int w_windzie, int czy_zajete[])
+{
+
+	RECT rc;
+	HDC hdcMem;
+	HBITMAP hbmMem, hbmOld;
+	HBRUSH hbrBkGnd;
+	// Get the size of the client rectangle.
+	GetClientRect(hWnd, &rc);
+	hdcMem = CreateCompatibleDC(lpPS->hdc);
+	hbmMem = CreateCompatibleBitmap(lpPS->hdc, rc.right - rc.left, rc.bottom - rc.top);
+	hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+	// usuwa tlo
+	hbrBkGnd = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+	FillRect(hdcMem, &rc, hbrBkGnd);
+	DeleteObject(hbrBkGnd);
+	MyOnPaint(hdc, w_windzie, czy_zajete);
+
+	BitBlt(lpPS->hdc, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, hdcMem, 0, 0, SRCCOPY);
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmMem);
+	DeleteDC(hdcMem);
 }
 
 void RamyWindy(HDC hdc)
@@ -158,10 +203,11 @@ void RamyWindy(HDC hdc)
 	graphics.DrawRectangle(&pen1, 150, value, 150, 100);
 }
 
-void repaintWindow(HWND hWnd, HDC &hdc, PAINTSTRUCT &ps, RECT *drawArea, int w_windzie)
+void repaintWindow(HWND hWnd, HDC &hdc, PAINTSTRUCT &ps, RECT *drawArea, int w_windzie, int czy_zajete[])
 {
 	
 	TCHAR buffer[20];
+	TCHAR buffer2[20];
 	//int pietro = 4 - value / 100;
 	int pietro;						
 	if (na_ktore.size())
@@ -169,19 +215,20 @@ void repaintWindow(HWND hWnd, HDC &hdc, PAINTSTRUCT &ps, RECT *drawArea, int w_w
 	else
 		pietro = -1;
 	_sntprintf_s(buffer, _countof(buffer), _T("%d"), na_ktore[0]);
-
+	_sntprintf_s(buffer2, _countof(buffer2), _T("%d"), w_windzie*70);
 	Pen pen1(Color(255, 255, 255), 2);
 
-	InvalidateRect(hWnd, drawArea, FALSE); //tutaj zmieni³em z TRUE na FALSE ¿eby nie miga³o, ale musia³em dodaæ "gumki"
+	InvalidateRect(hWnd, drawArea, FALSE); //tutaj zmieniï¿½em z TRUE na FALSE ï¿½eby nie migaï¿½o, ale musiaï¿½em dodaï¿½ "gumki"
 	hdc = BeginPaint(hWnd, &ps);
-	MyOnPaint(hdc, w_windzie);
+	MyOnPaint(hdc, w_windzie, czy_zajete);
 	Graphics graphics(hdc);
-	//tutaj s¹ gumki windy
+	//tutaj sï¿½ gumki windy
 	graphics.DrawLine(&pen1, 152, value + 3, 298, value + 3);
 	graphics.DrawLine(&pen1, 147, value + 103, 303, value + 103);
 	graphics.DrawLine(&pen1, 147, value - 3, 303, value - 3);
 	graphics.DrawLine(&pen1, 152, value + 97, 298, value + 97);
 	TextOut(hdc, 150, 10, buffer, _tcslen(buffer));
+	TextOut(hdc, 150, 25, buffer2, _tcslen(buffer2));
 	EndPaint(hWnd, &ps);
 }
 
@@ -298,14 +345,75 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		450, 120,
 		80, 50,
 		hWnd,
+		(HMENU)ID_BUTTON21,
+		hInstance,
+		NULL);
+
+	// parter
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("1"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 480,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON1,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("2"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 460,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON2,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("3"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 440,
+		20, 20,
+		hWnd,
 		(HMENU)ID_BUTTON3,
 		hInstance,
 		NULL);
 
 	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("4"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 420,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON4,
+		hInstance,
+		NULL);
+	//pietro 1
+		hwndButton = CreateWindow(TEXT("button"),
 		TEXT("0"),
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		0, 0,
+		430, 380,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON5,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("2"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		430, 360,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON6,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("3"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		430, 340,
 		20, 20,
 		hWnd,
 		(HMENU)ID_BUTTON7,
@@ -313,12 +421,112 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		NULL);
 
 	hwndButton = CreateWindow(TEXT("button"),
-		TEXT("1"),
+		TEXT("4"),
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		0, 20,
+		430, 320,
 		20, 20,
 		hWnd,
 		(HMENU)ID_BUTTON8,
+		hInstance,
+		NULL);      
+	//pietro 2
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("0"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 280,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON9,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("1"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 260,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON10,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("3"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 240,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON11,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("4"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 220,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON12,
+		hInstance,
+		NULL);
+	//pietro 3
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("0"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		430, 180,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON13,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("1"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		430, 160,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON14,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("2"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		430, 140,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON15,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("4"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		430, 120,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON16,
+		hInstance,
+		NULL);
+		//pietro 4
+		hwndButton = CreateWindow(TEXT("button"),
+		TEXT("0"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 80,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON17,
+		hInstance,
+		NULL);
+
+	hwndButton = CreateWindow(TEXT("button"),
+		TEXT("1"),
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		0, 60,
+		20, 20,
+		hWnd,
+		(HMENU)ID_BUTTON18,
 		hInstance,
 		NULL);
 
@@ -328,20 +536,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		0, 40,
 		20, 20,
 		hWnd,
-		(HMENU)ID_BUTTON9,
+		(HMENU)ID_BUTTON19,
 		hInstance,
 		NULL);
 
 	hwndButton = CreateWindow(TEXT("button"),
 		TEXT("3"),
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		0, 60,
+		0, 20,
 		20, 20,
 		hWnd,
-		(HMENU)ID_BUTTON10,
+		(HMENU)ID_BUTTON20,
 		hInstance,
 		NULL);
-
 
 	if (!hWnd)
 	{
@@ -367,12 +574,20 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
-	int static w_windzie = 0, pietro4 = 0;
+	int static w_windzie = 0, pietro0 = 0, pietro1 = 0, pietro2 = 0, pietro3 = 0, pietro4 = 0;
 	PAINTSTRUCT ps;
+	int static czy_zajete[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	// czy_zajete[0] = false;
+	// czy_zajete[1] = false;
+	// czy_zajete[2] = false;
+	// czy_zajete[3] = false;
+	// czy_zajete[4] = false;
+	// czy_zajete[5] = false;
+	// czy_zajete[6] = false;
+	// czy_zajete[7] = false;
 	HDC hdc;
 	std::vector<Osoba> static pasazer;
 	Osoba pas;
-
 	std::wstring outputString;
 
 
@@ -393,75 +608,218 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
-		/*case ID_BUTTON2:
-			value = 0;
-			w_ruchu = 0;
-			stop = 1;
-			SetTimer(hWnd, TMR_1, 10, 0);
-			repaintWindow(hWnd, hdc, ps, &drawArea1, w_windzie);
-			break;
-		//ten przycisk u¿ywa³em do wyœwietlania w okienku debugowania
-		case ID_BUTTON3:
-			if (na_ktore.size())
-				for (int i = 0;i < na_ktore.size();i++) {
-					outputString = std::to_wstring(na_ktore[i]) + L" ";
-					OutputDebugString(outputString.c_str());
-				}
+		//ten przycisk uï¿½ywaï¿½em do wyï¿½wietlania w okienku debugowania
+		// case ID_BUTTON21:
+		// 	if (na_ktore.size())
+		// 		for (int i = 0;i < na_ktore.size();i++) {
+		// 			outputString = std::to_wstring(na_ktore[i]) + L" ";
+		// 			OutputDebugString(outputString.c_str());
+		// 		}
 			
-			outputString = L"Dlugosc " + std::to_wstring(na_ktore.size()) + L" ";
-			OutputDebugString(outputString.c_str());
-			outputString = L"\n";
-			OutputDebugString(outputString.c_str());
+		// 	outputString = L"Dlugosc " + std::to_wstring(na_ktore.size()) + L" ";
+		// 	OutputDebugString(outputString.c_str());
+		// 	outputString = L"\n";
+		// 	OutputDebugString(outputString.c_str());
+		// 	break;
+		
+		case ID_BUTTON1:
+			//if(value != 400) 
+			na_ktore.push_back(0);
+			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setSkad(0);
+			pas.setDokad(1);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
+			pietro0++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-		*/
+		case ID_BUTTON2:
+			na_ktore.push_back(0);
+			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setSkad(0);
+			pas.setDokad(2);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
+			pietro0++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON3:
+			na_ktore.push_back(0);
+			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setSkad(0);
+			pas.setDokad(3);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
+			pietro0++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
 		case ID_BUTTON4:
-			w_gore = 0;
-			repaintWindow(hWnd, hdc, ps, &drawArea1, w_windzie);
+			na_ktore.push_back(0);
+			pas.setWsp(105 - 17*pietro0, 450);
+			pas.setSkad(0);
+			pas.setDokad(4);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
+			pietro0++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON5:
-			stop = 1;
+			na_ktore.push_back(1);
+			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setSkad(1);
+			pas.setDokad(0);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
+			pietro1++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-		case ID_BUTTON7:
-			na_ktore.push_back(4); //dodajê 4 do wektora na_które, ¿eby winda pojecha³a na 4 piêtro
-			pas.setWsp(110 - pietro4 * 30, 55); //tworzê pasa¿era, o wspó³rzêdnych na pierwszym miejscu na 4 piêtrze
-			pas.setSkad(4);  //ustawiam z jakiego pietra jedzie - chyba nie bêdzie potrzebne
-			pas.setDokad(0); //na jakie
-			pasazer.push_back(pas); //dodajê utworzonego pasa¿era do wektora pasazer
-			pasazer[pasazer.size() - 1].Spawn(hWnd, hdc, ps, &drawArea2, pietro4); //tutaj spawnuje tego pasa¿era na piêtrze 4 (drawArea2)
-			pietro4++;//dodajê ile osób czeka na 4 pietrze
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad()); //dodajê 0 do wektora na_które, ¿eby winda pojecha³a na 0 piêtro, czyli te
-			//które siê ustawi³o w pas.setDokad
+		case ID_BUTTON6:
+			na_ktore.push_back(1);
+			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setSkad(1);
+			pas.setDokad(2);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
+			pietro1++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-		//na piêtro 1
+			case ID_BUTTON7:
+			na_ktore.push_back(1);
+			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setSkad(1);
+			pas.setDokad(3);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
+			pietro1++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
 		case ID_BUTTON8:
+			na_ktore.push_back(1);
+			pas.setWsp(320 + 17*pietro1, 350);
+			pas.setSkad(1);
+			pas.setDokad(4);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
+			pietro1++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON9:
+			na_ktore.push_back(2);
+			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setSkad(2);
+			pas.setDokad(0);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
+			pietro2++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON10:
+			na_ktore.push_back(2);
+			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setSkad(2);
+			pas.setDokad(1);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
+			pietro2++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+			case ID_BUTTON11:
+			na_ktore.push_back(2);
+			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setSkad(2);
+			pas.setDokad(3);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
+			pietro2++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON12:
+			na_ktore.push_back(2);
+			pas.setWsp(105 - 17*pietro2, 250);
+			pas.setSkad(2);
+			pas.setDokad(4);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
+			pietro2++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON13:
+			na_ktore.push_back(3);
+			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setSkad(3);
+			pas.setDokad(0);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
+			pietro3++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON14:
+			na_ktore.push_back(3);
+			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setSkad(3);
+			pas.setDokad(1);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
+			pietro3++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON15:
+			na_ktore.push_back(3);
+			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setSkad(3);
+			pas.setDokad(2);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
+			pietro3++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON16:
+			na_ktore.push_back(3);
+			pas.setWsp(320 + 17*pietro3, 150);
+			pas.setSkad(3);
+			pas.setDokad(4);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
+			pietro3++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+			case ID_BUTTON17:
 			na_ktore.push_back(4);
-			pas.setWsp(110 - pietro4 * 30, 55);
+			pas.setWsp(105 - 17*pietro4, 50);
+			pas.setSkad(4);
+			pas.setDokad(0);
+			pasazer.push_back(pas);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
+			pietro4++;
+			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+			break;
+		case ID_BUTTON18:
+			na_ktore.push_back(4);
+			pas.setWsp(105 - 17*pietro4, 50);
 			pas.setSkad(4);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
-			pasazer[pasazer.size() - 1].Spawn(hWnd, hdc, ps, &drawArea2, pietro4);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 			pietro4++;
 			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-		//na piêtro 2
-		case ID_BUTTON9:
+		case ID_BUTTON19:
 			na_ktore.push_back(4);
-			pas.setWsp(110 - pietro4 * 30, 55);
-			pas.setSkad(4);  
-			pas.setDokad(2); 
+			pas.setWsp(105 - 17*pietro4, 50);
+			pas.setSkad(4);
+			pas.setDokad(2);
 			pasazer.push_back(pas);
-			pasazer[pasazer.size() - 1].Spawn(hWnd, hdc, ps, &drawArea2, pietro4); 
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 			pietro4++;
 			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-		//na piêtro 3
-		case ID_BUTTON10:
+		case ID_BUTTON20:
 			na_ktore.push_back(4);
-			pas.setWsp(110 - pietro4*30, 55);
+			pas.setWsp(105 - 17*pietro4, 50);
 			pas.setSkad(4);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
-			pasazer[pasazer.size() - 1].Spawn(hWnd, hdc, ps, &drawArea2, pietro4);
+			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 			pietro4++;
 			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
@@ -471,17 +829,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
+		Paint(hWnd, &ps, hdc, w_windzie, czy_zajete);
 		RamyWindy(hdc);
 		TextOut(hdc, 100, 10, L"Pietro", 6);
+		TextOut(hdc, 100, 25, L"Waga", 6);
 		EndPaint(hWnd, &ps);
 		stop = 1;
-		//przy uruchomieniu programu od razu odpala siê timer
+		//przy uruchomieniu programu od razu odpala siï¿½ timer
 		SetTimer(hWnd, TMR_1, 10, 0);
 		
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+		
+	case WM_ERASEBKGND: return (LRESULT)1; // Say we handled it.
 
 	case WM_TIMER:
 		switch (wParam)
@@ -490,19 +852,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 			if (na_ktore.size()){
 				//jesli winda dojedzie na docelowe miejsce, zatrzymuje sie
-				if (400 - value == 100 * na_ktore[0] && w_ruchu) {
+				if (400 - value == 100 * na_ktore[0]) {
 					stop = 1;
 					w_ruchu = 0;
 					ktory_tick = GetTickCount64();
 					na_ktore.erase(na_ktore.begin());
 				}
-				//kiedy winda dojedzie na miejsce i pasa¿er z indeksem 0 dojdzie do x = 400 (jeœli wychodzi w prawo) lub 140 (wychodzi w lewo)
-				//to usuwaj¹ siê wszyscy pasa¿erowie (trzeba zmieniæ) i liczba osób w windzie=0
-				if (w_windzie && (pasazer[0].getWspx() >= 400 || pasazer[0].getWspx() <= 140)) {
-					for (int i = 0; i < w_windzie; i++)
-						pasazer.erase(pasazer.begin());
-					w_windzie = 0;
-				}
+				
+				//kiedy winda dojedzie na miejsce i pasaï¿½er z indeksem 0 dojdzie do x = 400 (jeï¿½li wychodzi w prawo) lub 140 (wychodzi w lewo)
+				//to usuwajï¿½ siï¿½ wszyscy pasaï¿½erowie (trzeba zmieniï¿½) i liczba osï¿½b w windzie=0
+				// if (w_windzie && (pasazer[0].getWspx() >= 400 || pasazer[0].getWspx() <= 140)) {
+				// 	for (int i = 0; i < w_windzie; i++)
+				// 		pasazer.erase(pasazer.begin());
+				// 	w_windzie = 0;
+				// }
 			}
 			
 			/*for (int i = 0;i < pasazer.size();i++) {
@@ -510,8 +873,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				OutputDebugString(outputString.c_str());
 			}*/
 
-			outputString = std::to_wstring(w_windzie) + L"\n"; //to jest do wyœwietlania przy debugowaniu - klikasz lokalny debuger 
-			OutputDebugString(outputString.c_str());           //i to wyœwietla siê z prawej na dole
+			outputString = std::to_wstring(w_windzie) + L"\n"; //to jest do wyï¿½wietlania przy debugowaniu - klikasz lokalny debuger 
+			OutputDebugString(outputString.c_str());           //i to wyï¿½wietla siï¿½ z prawej na dole
 
 			/*if (na_ktore.size()) {
 				for (int i = 0;i < na_ktore.size();i++) {
@@ -524,81 +887,665 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			/*outputString = L"Dlugosc " + std::to_wstring(na_ktore.size()) + L" ";
 			OutputDebugString(outputString.c_str());*/
-			
-			
 
 
-			//wsiadanie do windy (na 4 piêtrze)
+			//wsiadanie do windy (na 4 piï¿½trze)
 			if (pasazer.size())
-				//dopóki pasa¿er, który wchodzi pierwszy nie osi¹gnie x = 265 to jego x zwiêszka siê o 1 (setWsp) i wyœwietla siê zwiêkszony o 1 (Idz)
-				if (value == 0 && stop == 1 && pasazer[0].getWspx() <= 265  && pietro4) {
-					for (int i = 0; i < pietro4; i++) {
-						pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
-						pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
-					}							
+			{
+				// if (value == 0 && stop == 1 && pasazer[0].getWspx() <= 265  && pietro4) {
+				// 	for (int i = 0; i < pietro4; i++) {
+				// 		pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+				// 		pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
+				// 	}							
+				// }
+				int ile_moze_wsiasc = 0, ile_wolnych = 0;
+				for(int i = 0; i < 8; i++)
+					if(!czy_zajete[i]) ile_wolnych++;
+				//dopï¿½ki pasaï¿½er, ktï¿½ry wchodzi pierwszy nie osiï¿½gnie x = 265 to jego x zwiï¿½szka siï¿½ o 1 (setWsp) i wyï¿½wietla siï¿½ zwiï¿½kszony o 1 (Idz)
+				if (value == 0 && stop == 1 && pietro4) 
+				{
+					//dodaÅ‚em jeden bo nie wiem czemu cos nie dzialalo 
+					if(ile_wolnych >= pietro4) ile_moze_wsiasc = pietro4+1;
+					else ile_moze_wsiasc = ile_wolnych;
+							for(int i = 0; i < pasazer.size(); i++)
+							{
+								if(pasazer[i].czy_w_windzie)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 4 && ile_moze_wsiasc)
+								{
+									pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
+									ile_moze_wsiasc--;
+									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
+									{
+										czy_zajete[0] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
+									{
+										czy_zajete[1] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
+									{
+										czy_zajete[2] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
+									{
+										czy_zajete[3] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
+									{
+										czy_zajete[4] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
+									{
+										czy_zajete[5] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
+									{
+										czy_zajete[6] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
+									{
+										czy_zajete[7] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro4--;
+									}
+								}
+							}		
 				}
+				ile_wolnych = 0;
+				for(int i = 0; i < 8; i++)
+					if(!czy_zajete[i]) ile_wolnych++;
+				if (value == 100 && stop == 1 && pietro3) {
+					if(ile_wolnych >= pietro3) ile_moze_wsiasc = pietro3+1;
+					else ile_moze_wsiasc = ile_wolnych;
+							for(int i = 0; i < pasazer.size(); i++)
+							{
+								if(pasazer[i].czy_w_windzie)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 3 && ile_moze_wsiasc)
+								{
+									pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
+									ile_moze_wsiasc--;
+									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
+									{
+										czy_zajete[0] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
+									{
+										czy_zajete[1] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
+									{
+										czy_zajete[2] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
+									{
+										czy_zajete[3] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
+									{
+										czy_zajete[4] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
+									{
+										czy_zajete[5] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
+									{
+										czy_zajete[6] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
+									{
+										czy_zajete[7] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro3--;
+									}
+								}
+							}						
+				}
+				ile_wolnych = 0;
+				for(int i = 0; i < 8; i++)
+					if(!czy_zajete[i]) ile_wolnych++;
+				if (value == 200 && stop == 1 && pietro2) {
+					if(ile_wolnych >= pietro2) ile_moze_wsiasc = pietro2+1;
+					else ile_moze_wsiasc = ile_wolnych;
+							for(int i = 0; i < pasazer.size(); i++)
+							{
+								if(pasazer[i].czy_w_windzie)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 2 && ile_moze_wsiasc)
+								{
+									pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
+									ile_moze_wsiasc--;
+									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
+									{
+										czy_zajete[0] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
+									{
+										czy_zajete[1] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
+									{
+										czy_zajete[2] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
+									{
+										czy_zajete[3] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
+									{
+										czy_zajete[4] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
+									{
+										czy_zajete[5] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
+									{
+										czy_zajete[6] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
+									{
+										czy_zajete[7] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro2--;
+									}
+								}
+							}							
+				}
+				ile_wolnych = 0;
+				for(int i = 0; i < 8; i++)
+					if(!czy_zajete[i]) ile_wolnych++;
+				if (value == 300 && stop == 1 && pietro1) {
+					if(ile_wolnych >= pietro1) ile_moze_wsiasc = pietro1+1;
+					else ile_moze_wsiasc = ile_wolnych;
+							for(int i = 0; i < pasazer.size(); i++)
+							{
+								if(pasazer[i].czy_w_windzie)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 1 && ile_moze_wsiasc)
+								{
+									pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
+									ile_moze_wsiasc--;
+									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
+									{
+										czy_zajete[0] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
+									{
+										czy_zajete[1] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
+									{
+										czy_zajete[2] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
+									{
+										czy_zajete[3] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
+									{
+										czy_zajete[4] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
+									{
+										czy_zajete[5] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
+									{
+										czy_zajete[6] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
+									{
+										czy_zajete[7] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro1--;
+									}
+								}
+							}														
+				}
+				ile_wolnych = 0;
+				for(int i = 0; i < 8; i++)
+					if(!czy_zajete[i]) ile_wolnych++;
+				if (value == 400 && stop == 1 && pietro0) {
+					if(ile_wolnych >= pietro0) ile_moze_wsiasc = pietro0+1;
+					else ile_moze_wsiasc = ile_wolnych;
+							for(int i = 0; i < pasazer.size(); i++)
+							{
+								if(pasazer[i].czy_w_windzie)
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
+								if(!pasazer[i].czy_w_windzie && pasazer[i].getSkad() == 0 && ile_moze_wsiasc)
+								{
+									pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
+									ile_moze_wsiasc--;
+									if(pasazer[i].getWspx() == 154 && !czy_zajete[0]) 
+									{
+										czy_zajete[0] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+									else if(pasazer[i].getWspx() == 172 && !czy_zajete[1]) 
+									{
+										czy_zajete[1] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+									else if(pasazer[i].getWspx() == 190 && !czy_zajete[2]) 
+									{
+										czy_zajete[2] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+									else if(pasazer[i].getWspx() == 208 && !czy_zajete[3]) 
+									{
+										czy_zajete[3] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+									else if(pasazer[i].getWspx() == 226 && !czy_zajete[4]) 
+									{
+										czy_zajete[4] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+									else if(pasazer[i].getWspx() == 244 && !czy_zajete[5]) 
+									{
+										czy_zajete[5] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+									else if(pasazer[i].getWspx() == 262 && !czy_zajete[6]) 
+									{
+										czy_zajete[6] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+									else if(pasazer[i].getWspx() == 280 && !czy_zajete[7]) 
+									{
+										czy_zajete[7] = true;
+										pasazer[i].czy_w_windzie = true;
+										pietro0--;
+									}
+								}
+							}							
+				}
+			}
+			w_windzie =  0;
+			for(int i = 0; i < 8; i++)
+				if(czy_zajete[i]) w_windzie++;
 
 			int static buf = 0; //do jednorazowego zaktualizowania pozycji
 			
 			//wysiadanie
 			if (pasazer.size()) {
-				//winda zatrzyma siê na piêtrze 3 jeœli pasa¿er z indeksem 0 chcia³ na to piêtro
-				if (value == 100 && stop == 1 && pasazer[0].getDokad() == 3) { //pietro3
-					//tutaj ta aktualizacja pozycji - musi byæ, bo funkcja wyœwietlaj¹ca windê z pasa¿erami nie aktualizuje pozycji pasa¿erów
+				//winda zatrzyma siï¿½ na piï¿½trze 3 jeï¿½li pasaï¿½er z indeksem 0 chciaï¿½ na to piï¿½tro
+				if (value == 100 && stop == 1) 
+				{ //pietro3
+					//tutaj ta aktualizacja pozycji - musi byï¿½, bo funkcja wyï¿½wietlajï¿½ca windï¿½ z pasaï¿½erami nie aktualizuje pozycji pasaï¿½erï¿½w
 					if (!buf) { 
-						for (int i = 0; i < w_windzie; i++)
-							pasazer[i].setWsp(265 - i * 30, value + 55);
-						buf = 1;
+						for (int i = 0; i < pasazer.size(); i++)
+						{
+							if(pasazer[i].czy_w_windzie)
+								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
+							buf = 1;
+						}
 					}
-					//tutaj w³aœciwie zaczyna siê wysiadanie - wysiadaj¹ zawsze wszyscy (trzeba zmieniæ)
-					//zmieniam pozycjê x o 1 fukncj¹ setWsp, a póŸniej wyœwietlam funkcj¹ Idz
-					//robiê to dla ka¿dego pasa¿era w windzie
-					for (int i = 0; i < w_windzie; i++) {
-						pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
-						pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, w_windzie);
+					//tutaj wï¿½aï¿½ciwie zaczyna siï¿½ wysiadanie - wysiadajï¿½ zawsze wszyscy (trzeba zmieniï¿½)
+					//zmieniam pozycjï¿½ x o 1 fukncjï¿½ setWsp, a pï¿½niej wyï¿½wietlam funkcjï¿½ Idz
+					//robiï¿½ to dla kaï¿½dego pasaï¿½era w windzie
+					for (int i = 0; i < pasazer.size(); i++) 
+					{
+						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, w_windzie);
+						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 3 && !pasazer[i].czy_wysiada)
+						{
+							if(pasazer[i].getWspx() == 154) 
+							{ 
+								czy_zajete[0] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 172) { 
+								czy_zajete[1] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 190) { 
+								czy_zajete[2] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 208) { 
+								czy_zajete[3] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 226) { 
+								czy_zajete[4] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 244) { 
+								czy_zajete[5] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 262) { 
+								czy_zajete[6] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 280) { 
+								czy_zajete[7] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+						}
+						if(pasazer[i].czy_wysiada){
+							pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, w_windzie);
+						}
+						if(pasazer[i].getWspx() > 450){
+							pasazer[i].czy_w_windzie = false;
+							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+						}
 					}
 					//break;
 				}
-				//to samo tylko dla kolejnych piêter
-				if (value == 300 && stop == 1 && pasazer[0].getDokad() == 1) { //pietro1
+				//to samo tylko dla kolejnych piï¿½ter
+				if (value == 300 && stop == 1) { //pietro1
 					if (!buf) {
-						for (int i = 0; i < w_windzie; i++)
-							pasazer[i].setWsp(265 - i*30, value + 55);
-						buf = 1;
+						for (int i = 0; i < pasazer.size(); i++)
+						{
+							if(pasazer[i].czy_w_windzie)
+								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
+							buf = 1;
+						}
 					}
-					for (int i = 0; i < w_windzie; i++)
-						pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
-					for (int i = 0; i < w_windzie; i++)
-						pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, w_windzie);
+					for (int i = 0; i < pasazer.size(); i++) 
+					{
+						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, w_windzie);
+						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 1 && !pasazer[i].czy_wysiada)
+						{
+							if(pasazer[i].getWspx() == 154) 
+							{ 
+								czy_zajete[0] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 172) { 
+								czy_zajete[1] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 190) { 
+								czy_zajete[2] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 208) { 
+								czy_zajete[3] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 226) { 
+								czy_zajete[4] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 244) { 
+								czy_zajete[5] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 262) { 
+								czy_zajete[6] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 280) { 
+								czy_zajete[7] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+						}
+						if(pasazer[i].czy_wysiada){
+							pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
+							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, w_windzie);
+						}
+						if(pasazer[i].getWspx() > 450){
+							pasazer[i].czy_w_windzie = false;
+							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+						}
+					}
+
 					//break;
 				}
-				if (value == 200 && stop == 1 && pasazer[0].getDokad() == 2) { //pietro2
+				if (value == 200 && stop == 1) { //pietro2
 					if (!buf) { 
-						for (int i = 0; i < w_windzie; i++)
-							pasazer[i].setWsp(265 - i*30, value + 55);
-						buf = 1;
+						for (int i = 0; i < pasazer.size(); i++)
+						{
+							if(pasazer[i].czy_w_windzie)
+								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
+							buf = 1;
+						}
 					}
-					for (int i = 0; i < w_windzie; i++) {
-						pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
-						pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, w_windzie);
+					for (int i = 0; i < pasazer.size(); i++) 
+					{
+						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, w_windzie);
+						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 2 && !pasazer[i].czy_wysiada)
+						{
+							if(pasazer[i].getWspx() == 154) 
+							{ 
+								czy_zajete[0] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 172) { 
+								czy_zajete[1] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 190) { 
+								czy_zajete[2] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 208) { 
+								czy_zajete[3] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 226) { 
+								czy_zajete[4] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 244) { 
+								czy_zajete[5] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 262) { 
+								czy_zajete[6] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 280) { 
+								czy_zajete[7] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+						}
+						if(pasazer[i].czy_wysiada){
+							pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
+							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, w_windzie);
+						}
+						if(pasazer[i].getWspx() < 3){
+							pasazer[i].czy_w_windzie = false;
+							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+						}
 					}
 					//break;
 				}
-				if (value == 400 && stop == 1 && pasazer[0].getDokad() == 0) { //pietro0
+				if (value == 400 && stop == 1) { //pietro0
 					if (!buf) { 
-						for (int i = 0; i < w_windzie; i++)
-							pasazer[i].setWsp(265 - i * 30, value + 55);
-						buf = 1;
+						for (int i = 0; i < pasazer.size(); i++)
+						{
+							if(pasazer[i].czy_w_windzie)
+								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
+							buf = 1;
+						}
 					}
-					for (int i = 0; i < w_windzie; i++) {
-						pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
-						pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, w_windzie);
+					for (int i = 0; i < pasazer.size(); i++) 
+					{
+						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, w_windzie);
+						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 0 && !pasazer[i].czy_wysiada)
+						{
+							if(pasazer[i].getWspx() == 154) 
+							{ 
+								czy_zajete[0] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 172) { 
+								czy_zajete[1] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 190) { 
+								czy_zajete[2] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 208) { 
+								czy_zajete[3] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 226) { 
+								czy_zajete[4] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 244) { 
+								czy_zajete[5] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 262) { 
+								czy_zajete[6] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 280) { 
+								czy_zajete[7] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+						}
+						if(pasazer[i].czy_wysiada){
+							pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
+							pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, w_windzie);
+						}
+						if(pasazer[i].getWspx() < 3){
+							pasazer[i].czy_w_windzie = false;
+							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+						}
+					}
+				}
+				if (value == 0 && stop == 1) { //pietro4
+					if (!buf) { 
+						for (int i = 0; i < pasazer.size(); i++)
+						{
+							if(pasazer[i].czy_w_windzie)
+								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
+							buf = 1;
+						}
+					}
+					for (int i = 0; i < pasazer.size(); i++) 
+					{
+						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, w_windzie);
+						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 4 && !pasazer[i].czy_wysiada) 
+						{
+							if(pasazer[i].getWspx() == 154) 
+							{ 
+								czy_zajete[0] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 172) { 
+								czy_zajete[1] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 190) { 
+								czy_zajete[2] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 208) { 
+								czy_zajete[3] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 226) { 
+								czy_zajete[4] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 244) { 
+								czy_zajete[5] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 262) { 
+								czy_zajete[6] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+							else if(pasazer[i].getWspx() == 280) { 
+								czy_zajete[7] = false;
+								pasazer[i].czy_wysiada = true;
+							}
+						}
+						if(pasazer[i].czy_wysiada){
+								pasazer[i].setWsp(pasazer[i].getWspx() - 1, pasazer[i].getWspy());
+								pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, w_windzie);
+							}
+							if(pasazer[i].getWspx() < 3)
+							{
+								pasazer[i].czy_w_windzie = false;
+								pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+							}
 					}
 				}
 			}
 
-			//jeœli winda stoi, to ruszy po 3 sekundach jeœli bêdzie mia³a kolejne piêtro na które ma jechaæ
-			if (GetTickCount64() - ktory_tick >= 3000 && !w_ruchu && na_ktore.size()) {
+			//jeï¿½li winda stoi, to ruszy po 3 sekundach jeï¿½li bï¿½dzie miaï¿½a kolejne piï¿½tro na ktï¿½re ma jechaï¿½
+			if (GetTickCount64() - ktory_tick >= 5000 && !w_ruchu && na_ktore.size()) {
 				if (na_ktore[0] * 100 > 400 - value)
 					w_gore = 1;
 				if (na_ktore[0] * 100 < 400 - value)
@@ -606,35 +1553,126 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				stop = 0;
 				w_ruchu = 1;
 			}
+			bool czy_pusta;
+			for(int i = 0; i < 8; i++)
+			{
+				if(!czy_zajete[i]) czy_pusta = true;
+				else 
+				{
+					czy_pusta = false;
+					break;
+				}
+			}
+			// tu kacpra odnosnie w_windzie
 
 			//jesli pasazer z 4 pietra dojdzie do wspolrzednej x = 265 i jest z tego pietra to zwieksza sie liczba osob w windzie
-			//to nadal chyba nie dzia³a poprawnie, wiêc dajê tylko, ¿e liczba pasa¿erów ogólnie na mapie to liczba osób w windzie
-			if(pasazer.size())
-				if (pasazer[0].getWspx() == 265 && pasazer[0].getSkad() == 4 - value / 100 && value == 0) {
-					w_windzie++;		//powinno dzialac, ale za duzo dodaje (bo za duzo sie odpala), trzeba dodac jakies warunki
-					w_windzie = pasazer.size(); //dziala tylko jak wsiada wszyscy z 4 pietra
-				}
+			//to nadal chyba nie dziaï¿½a poprawnie, wiï¿½c dajï¿½ tylko, ï¿½e liczba pasaï¿½erï¿½w ogï¿½lnie na mapie to liczba osï¿½b w windzie
+			// if(pasazer.size())
+			// 	if (pasazer[0].getWspx() == 265 && pasazer[0].getSkad() == 4 - value / 100 && value == 0) {
+			// 		w_windzie++;		//powinno dzialac, ale za duzo dodaje (bo za duzo sie odpala), trzeba dodac jakies warunki
+			// 		w_windzie = pasazer.size(); //dziala tylko jak wsiada wszyscy z 4 pietra
+			// 	}
 
-			//jesli winda ma value = 0 (0 pikseli w dol), czyli jest na 4 pietrze i pasazerowie wejd¹ do windy to liczba osób na pietrze 4 = 0
-			if (value == 0 && w_windzie) {
-				pietro4 = 0;
-				if (na_ktore.size())
-					if(na_ktore[0] == 4) //tutaj usuwam piêtro 4 z kolejki, na które ma jechaæ winda, bo ju¿ tutaj jest
-						na_ktore.erase(na_ktore.begin());
+			//jesli winda ma value = 0 (0 pikseli w dol), czyli jest na 4 pietrze i pasazerowie wejdï¿½ do windy to liczba osï¿½b na pietrze 4 = 0
+			// if (value == 0 && w_windzie) {
+			// 	//pietro4 = 0;
+			// 	if (na_ktore.size())
+			// 		if(na_ktore[0] == 4) //tutaj usuwam piï¿½tro 4 z kolejki, na ktï¿½re ma jechaï¿½ winda, bo juï¿½ tutaj jest
+			// 			na_ktore.erase(na_ktore.begin());
 
-				//usuwam powtarzaj¹ce siê elementy w kolejce piêter na które ma jechaæ winda (bo jak kilka osób chce jechaæ na te same to
-				//ka¿de klikniêcie dodaje te piêtro do kolejki, a wystraczy, ¿eby by³o tylko raz
+				//usuwam powtarzajï¿½ce siï¿½ elementy w kolejce piï¿½ter na ktï¿½re ma jechaï¿½ winda (bo jak kilka osï¿½b chce jechaï¿½ na te same to
+				//kaï¿½de klikniï¿½cie dodaje te piï¿½tro do kolejki, a wystraczy, ï¿½eby byï¿½o tylko raz
+				bool dodaj = false;
+				int kolejne_pietro = 0;
 				auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
 				na_ktore.erase(uniqueEnd, na_ktore.end());
+				std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
+				int ile_wolnych = 0;
+				for(int i = 0; i < 8; i++)
+					if(!czy_zajete[i]) ile_wolnych++;
+				if(ile_wolnych)
+				{
+					if(w_gore)
+					{
+							for(int i = 0; i < pasazer.size(); i++)
+							{
+								if(pasazer[i].getSkad() < na_ktore[0] && !pasazer[i].czy_w_windzie && pasazer[i].getDokad() > pasazer[i].getSkad())
+								{
+									dodaj = true;
+									kolejne_pietro = pasazer[i].getSkad();
+								}
+							}
+							if(dodaj) na_ktore.insert(na_ktore.begin(), kolejne_pietro);
+					}
+					else 
+					{
+						for(int i = 0; i < pasazer.size(); i++)
+						{
+							if(pasazer[i].getSkad() > na_ktore[0] && !pasazer[i].czy_w_windzie && pasazer[i].getDokad() < pasazer[i].getSkad())
+							{
+								dodaj = true;
+								kolejne_pietro = pasazer[i].getSkad();
+							}
+						}
+						if(dodaj) na_ktore.insert(na_ktore.begin(), kolejne_pietro);
+					}
+				}
 
-				//sortujê malej¹ca, bo winda jedzie w dó³ (bêdzie trzeba to uzale¿niæ od tego czy jedzie w górê, wtedy trzeba inaczej sortowaæ)
-				//a sortujê po to, ¿eby zje¿d¿aj¹c w dó³ odwiedzaæ piêtra po kolei, np. 3,1,0, zamiast 1,0,3, bo przed sortowaniem
-				//kolejnoœæ jest ustalona przez klikniêcia przycisku, na które chce jechaæ
-				std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {
-					return a > b;
-					});
-			}
-
+				//sortujï¿½ malejï¿½ca, bo winda jedzie w dï¿½ (bï¿½dzie trzeba to uzaleï¿½niï¿½ od tego czy jedzie w gï¿½rï¿½, wtedy trzeba inaczej sortowaï¿½)
+				//a sortujï¿½ po to, ï¿½eby zjeï¿½dï¿½ajï¿½c w dï¿½ odwiedzaï¿½ piï¿½tra po kolei, np. 3,1,0, zamiast 1,0,3, bo przed sortowaniem
+				//kolejnoï¿½ï¿½ jest ustalona przez klikniï¿½cia przycisku, na ktï¿½re chce jechaï¿½
+				//if(!w_gore)
+					//std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
+				//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
+			// }
+			// if(value == 100 && w_windzie)
+			// {
+			// 	//pietro3 = 0;
+			// 	if(na_ktore.size())
+			// 		if(na_ktore[0] == 3)
+			// 			na_ktore.erase(na_ktore.begin());
+			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
+			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
+			// 	//if(!w_gore)
+			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
+			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
+			// }
+			// if(value == 200 && w_windzie)
+			// {
+			// 	//pietro3 = 0;
+			// 	if(na_ktore.size())
+			// 		if(na_ktore[0] == 2)
+			// 			na_ktore.erase(na_ktore.begin());
+			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
+			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
+			// 	//if(!w_gore)
+			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
+			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
+			// }
+			// if(value == 300 && w_windzie)
+			// {
+			// 	//pietro3 = 0;
+			// 	if(na_ktore.size())
+			// 		if(na_ktore[0] == 1)
+			// 			na_ktore.erase(na_ktore.begin());
+			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
+			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
+			// 	//if(!w_gore)
+			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
+			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
+			// }
+			// if(value == 400 && w_windzie)
+			// {
+			// 	//pietro3 = 0;
+			// 	if(na_ktore.size())
+			// 		if(na_ktore[0] == 0)
+			// 			na_ktore.erase(na_ktore.begin());
+			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
+			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
+			// 	//if(!w_gore)
+			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
+			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
+			// }
 
 			//to jest zeby jak winda stoi, to nie aktualizowac okienka, zeby nie migalo
 			if (stop)
@@ -650,7 +1688,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				value--;
 			
 				
-			repaintWindow(hWnd, hdc, ps, &drawArea1, w_windzie);
+			repaintWindow(hWnd, hdc, ps, &drawArea1, w_windzie, czy_zajete);
 			
 			break;
 		}
