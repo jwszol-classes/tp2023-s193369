@@ -18,8 +18,8 @@ TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
 
 INT value;
 ULONGLONG ktory_tick;
-bool w_gore = 0;
-bool stop = 0;
+bool w_gore = 1;
+bool stop = 1;
 bool w_ruchu = 0;
 
 
@@ -51,10 +51,10 @@ INT_PTR CALLBACK	Buttons(HWND, UINT, WPARAM, LPARAM);
 
 class Osoba {
 	private:
-		int wspx;
-		int wspy;
-		int skad;
-		int dokad;
+		int wspx = -1;
+		int wspy = -1;
+		int skad = -1;
+		int dokad = -1;
 	public:
 		
 		void Spawn(HWND, HDC&, PAINTSTRUCT&, RECT*, int ile_na_pietrze);
@@ -66,31 +66,15 @@ class Osoba {
  		int getWspx() const {
 			return wspx;
 		}
-
-		int getWspy() const {
-			return wspy;
-		}
-
-		int getSkad() const {
-			return skad;
-		}
-
-		int getDokad() const {
-			return dokad;
-		}
-
+		int getWspy() const {return wspy;}
+		int getSkad() const {return skad;}
+		int getDokad() const {return dokad;}
 		void setWsp(int x, int y) {
 			wspx = x;
 			wspy = y;
 		}
-
-		void setSkad(int skad1) {
-			skad = skad1;
-		}
-
-		void setDokad(int dokad1) {
-			dokad = dokad1;
-		}
+		void setSkad(int skad1) {skad = skad1;}
+		void setDokad(int dokad1) {dokad = dokad1;}
 };
 void Osoba::Idz(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, int w_windzie) {
 
@@ -163,8 +147,6 @@ void MyOnPaint(HDC hdc, int w_windzie, int czy_zajete[])
 		}
 		if(czy_zajete[i]) graphics.DrawRectangle(&pen1, 154 + i*18, value + 55, 13, 35);
 	}
-	
-
 }
 static void Paint(HWND hWnd, LPPAINTSTRUCT lpPS, HDC hdc, int w_windzie, int czy_zajete[])
 {
@@ -175,16 +157,29 @@ static void Paint(HWND hWnd, LPPAINTSTRUCT lpPS, HDC hdc, int w_windzie, int czy
 	HBRUSH hbrBkGnd;
 	// Get the size of the client rectangle.
 	GetClientRect(hWnd, &rc);
+	// Create a compatible DC.
 	hdcMem = CreateCompatibleDC(lpPS->hdc);
+	// Create a bitmap big enough for our client rectangle.
 	hbmMem = CreateCompatibleBitmap(lpPS->hdc, rc.right - rc.left, rc.bottom - rc.top);
+	// Select the bitmap into the off-screen DC.
 	hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-	// usuwa tlo
+	// Erase the background.
 	hbrBkGnd = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
 	FillRect(hdcMem, &rc, hbrBkGnd);
 	DeleteObject(hbrBkGnd);
 	MyOnPaint(hdc, w_windzie, czy_zajete);
+	// Drawing goes here.
+	// HPEN hPenOld;
+	// HPEN hLinePen;
+	// COLORREF qLineColor;
+	// qLineColor = RGB(255, 0, 0);
+	// hLinePen = CreatePen(PS_SOLID, 7, qLineColor);
+	// hPenOld = (HPEN)SelectObject(hdcMem, hLinePen);
+	// SelectObject(hdcMem, hPenOld);
+	// DeleteObject(hLinePen);
 
 	BitBlt(lpPS->hdc, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, hdcMem, 0, 0, SRCCOPY);
+	// Done with off-screen bitmap and DC.
 	SelectObject(hdcMem, hbmOld);
 	DeleteObject(hbmMem);
 	DeleteDC(hdcMem);
@@ -214,7 +209,14 @@ void repaintWindow(HWND hWnd, HDC &hdc, PAINTSTRUCT &ps, RECT *drawArea, int w_w
 		pietro = na_ktore[0];
 	else
 		pietro = -1;
-	_sntprintf_s(buffer, _countof(buffer), _T("%d"), na_ktore[0]);
+	_sntprintf_s(buffer, _countof(buffer), _T("%d"), pietro);
+
+	w_windzie = 0;
+
+	for (int i = 0; i < 8; i++)
+		if(czy_zajete[i])
+			w_windzie++;
+
 	_sntprintf_s(buffer2, _countof(buffer2), _T("%d"), w_windzie*70);
 	Pen pen1(Color(255, 255, 255), 2);
 
@@ -281,7 +283,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	return (int)msg.wParam;
 }
-
 
 
 //
@@ -577,18 +578,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int static w_windzie = 0, pietro0 = 0, pietro1 = 0, pietro2 = 0, pietro3 = 0, pietro4 = 0;
 	PAINTSTRUCT ps;
 	int static czy_zajete[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	// czy_zajete[0] = false;
-	// czy_zajete[1] = false;
-	// czy_zajete[2] = false;
-	// czy_zajete[3] = false;
-	// czy_zajete[4] = false;
-	// czy_zajete[5] = false;
-	// czy_zajete[6] = false;
-	// czy_zajete[7] = false;
 	HDC hdc;
 	std::vector<Osoba> static pasazer;
 	Osoba pas;
 	std::wstring outputString;
+	static int wartosc1 = -1, wartosc2 = -1;
+	bool poszedl = 1, wsiada;
 
 
 	switch (message)
@@ -623,221 +618,205 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// 	break;
 		
 		case ID_BUTTON1:
-			//if(value != 400) 
-			na_ktore.push_back(0);
 			pas.setWsp(105 - 17*pietro0, 450);
 			pas.setSkad(0);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
 			pietro0++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+
 			break;
 		case ID_BUTTON2:
-			na_ktore.push_back(0);
 			pas.setWsp(105 - 17*pietro0, 450);
 			pas.setSkad(0);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
 			pietro0++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON3:
-			na_ktore.push_back(0);
 			pas.setWsp(105 - 17*pietro0, 450);
 			pas.setSkad(0);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
 			pietro0++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON4:
-			na_ktore.push_back(0);
 			pas.setWsp(105 - 17*pietro0, 450);
 			pas.setSkad(0);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
 			pietro0++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON5:
-			na_ktore.push_back(1);
 			pas.setWsp(320 + 17*pietro1, 350);
 			pas.setSkad(1);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
 			pietro1++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON6:
-			na_ktore.push_back(1);
 			pas.setWsp(320 + 17*pietro1, 350);
 			pas.setSkad(1);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
 			pietro1++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-			case ID_BUTTON7:
-			na_ktore.push_back(1);
+		case ID_BUTTON7:
 			pas.setWsp(320 + 17*pietro1, 350);
 			pas.setSkad(1);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
 			pietro1++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON8:
-			na_ktore.push_back(1);
 			pas.setWsp(320 + 17*pietro1, 350);
 			pas.setSkad(1);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
 			pietro1++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON9:
-			na_ktore.push_back(2);
 			pas.setWsp(105 - 17*pietro2, 250);
 			pas.setSkad(2);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
 			pietro2++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON10:
-			na_ktore.push_back(2);
 			pas.setWsp(105 - 17*pietro2, 250);
 			pas.setSkad(2);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
 			pietro2++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-			case ID_BUTTON11:
-			na_ktore.push_back(2);
+		case ID_BUTTON11:
 			pas.setWsp(105 - 17*pietro2, 250);
 			pas.setSkad(2);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
 			pietro2++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON12:
-			na_ktore.push_back(2);
 			pas.setWsp(105 - 17*pietro2, 250);
 			pas.setSkad(2);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
 			pietro2++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON13:
-			na_ktore.push_back(3);
 			pas.setWsp(320 + 17*pietro3, 150);
 			pas.setSkad(3);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
 			pietro3++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON14:
-			na_ktore.push_back(3);
 			pas.setWsp(320 + 17*pietro3, 150);
 			pas.setSkad(3);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
 			pietro3++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON15:
-			na_ktore.push_back(3);
 			pas.setWsp(320 + 17*pietro3, 150);
 			pas.setSkad(3);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
 			pietro3++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON16:
-			na_ktore.push_back(3);
 			pas.setWsp(320 + 17*pietro3, 150);
 			pas.setSkad(3);
 			pas.setDokad(4);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
 			pietro3++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
-			case ID_BUTTON17:
-			na_ktore.push_back(4);
+		case ID_BUTTON17:
 			pas.setWsp(105 - 17*pietro4, 50);
 			pas.setSkad(4);
 			pas.setDokad(0);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 			pietro4++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+
 			break;
 		case ID_BUTTON18:
-			na_ktore.push_back(4);
 			pas.setWsp(105 - 17*pietro4, 50);
 			pas.setSkad(4);
 			pas.setDokad(1);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 			pietro4++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
+
 			break;
 		case ID_BUTTON19:
-			na_ktore.push_back(4);
 			pas.setWsp(105 - 17*pietro4, 50);
 			pas.setSkad(4);
 			pas.setDokad(2);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 			pietro4++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		case ID_BUTTON20:
-			na_ktore.push_back(4);
 			pas.setWsp(105 - 17*pietro4, 50);
 			pas.setSkad(4);
 			pas.setDokad(3);
 			pasazer.push_back(pas);
 			pasazer[pasazer.size()-1].Spawn(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
 			pietro4++;
-			na_ktore.push_back(pasazer[pasazer.size()-1].getDokad());
 			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
+		wartosc1 = 0;
+		wartosc2 = 0;
+
+
+		for (unsigned int i = 0; i < na_ktore.size(); i++) {
+			if (na_ktore[i] == pas.getSkad()) {
+				wartosc1++;
+			}
+			if (na_ktore[i] == pas.getDokad()) {
+				wartosc2++;
+			}
+		}
+
+		if(!wartosc1 && value != 400 - pas.getSkad()*100)
+			na_ktore.push_back(pas.getSkad());
+		if (!wartosc2)
+			na_ktore.push_back(pas.getDokad());
+
+		if (stop && value == 400 - pas.getSkad() * 100)
+			ktory_tick = GetTickCount64();
+
 		break;
+
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		Paint(hWnd, &ps, hdc, w_windzie, czy_zajete);
 		RamyWindy(hdc);
 		TextOut(hdc, 100, 10, L"Pietro", 6);
-		TextOut(hdc, 100, 25, L"Waga", 6);
+		TextOut(hdc, 100, 25, L"Waga", 4);
 		EndPaint(hWnd, &ps);
 		stop = 1;
 		//przy uruchomieniu programu od razu odpala si� timer
 		SetTimer(hWnd, TMR_1, 10, 0);
-		
+		na_ktore.push_back(0);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
@@ -858,14 +837,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					ktory_tick = GetTickCount64();
 					na_ktore.erase(na_ktore.begin());
 				}
-				
-				//kiedy winda dojedzie na miejsce i pasa�er z indeksem 0 dojdzie do x = 400 (je�li wychodzi w prawo) lub 140 (wychodzi w lewo)
-				//to usuwaj� si� wszyscy pasa�erowie (trzeba zmieni�) i liczba os�b w windzie=0
-				// if (w_windzie && (pasazer[0].getWspx() >= 400 || pasazer[0].getWspx() <= 140)) {
-				// 	for (int i = 0; i < w_windzie; i++)
-				// 		pasazer.erase(pasazer.begin());
-				// 	w_windzie = 0;
-				// }
+				if (w_ruchu)
+					for (unsigned int i = 0; i < pasazer.size(); i++) {
+						if (400 - 100 * pasazer[i].getDokad() == value && pasazer[i].czy_w_windzie)
+						{
+							stop = 1;
+							w_ruchu = 0;
+							ktory_tick = GetTickCount64();
+							for (unsigned int i = 0; i < na_ktore.size(); i++)
+								if (value == 400 - 100 * na_ktore.at(i))
+									na_ktore.erase(na_ktore.begin() + i);
+						}
+						if (w_windzie < 8 && (400 - 100 * pasazer[i].getSkad() == value && value == 400 && pietro0
+							|| 400 - 100 * pasazer[i].getSkad() == value && value == 300 && pietro1
+							|| 400 - 100 * pasazer[i].getSkad() == value && value == 200 && pietro2
+							|| 400 - 100 * pasazer[i].getSkad() == value && value == 100 && pietro3
+							|| 400 - 100 * pasazer[i].getSkad() == value && value == 0 && pietro4))
+						{
+							stop = 1;
+							w_ruchu = 0;
+							ktory_tick = GetTickCount64();
+							for (unsigned int i = 0; i < na_ktore.size(); i++)
+								if (value == 400 - 100 * na_ktore.at(i))
+									na_ktore.erase(na_ktore.begin() + i);
+						}
+					}
+
 			}
 			
 			/*for (int i = 0;i < pasazer.size();i++) {
@@ -873,41 +870,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				OutputDebugString(outputString.c_str());
 			}*/
 
-			outputString = std::to_wstring(w_windzie) + L"\n"; //to jest do wy�wietlania przy debugowaniu - klikasz lokalny debuger 
-			OutputDebugString(outputString.c_str());           //i to wy�wietla si� z prawej na dole
+			//outputString = std::to_wstring(w_windzie) + L"\n"; //to jest do wy�wietlania przy debugowaniu - klikasz lokalny debuger 
+			//OutputDebugString(outputString.c_str());           //i to wy�wietla si� z prawej na dole
 
-			/*if (na_ktore.size()) {
-				for (int i = 0;i < na_ktore.size();i++) {
+			if (na_ktore.size()) {
+				for (unsigned int i = 0;i < na_ktore.size();i++) {
 					outputString = std::to_wstring(na_ktore[i]) + L" ";
 					OutputDebugString(outputString.c_str());
 				}
 				outputString = L"\n";
 				OutputDebugString(outputString.c_str());
-			}*/
+			}
 
-			/*outputString = L"Dlugosc " + std::to_wstring(na_ktore.size()) + L" ";
+			/*for (int i = 0; i < 8; i++) {
+				outputString = std::to_wstring(czy_zajete[i]) + L" ";
+				OutputDebugString(outputString.c_str());
+			}
+			outputString = L"\n";
 			OutputDebugString(outputString.c_str());*/
 
-
+			/*outputString = L"Dlugosc " + std::to_wstring(pasazer.size()) + L" ";
+			OutputDebugString(outputString.c_str());
+			outputString = L"\n";
+			OutputDebugString(outputString.c_str());*/
+			wsiada = 0;
 			//wsiadanie do windy (na 4 pi�trze)
 			if (pasazer.size())
 			{
-				// if (value == 0 && stop == 1 && pasazer[0].getWspx() <= 265  && pietro4) {
-				// 	for (int i = 0; i < pietro4; i++) {
-				// 		pasazer[i].setWsp(pasazer[i].getWspx() + 1, pasazer[i].getWspy());
-				// 		pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
-				// 	}							
-				// }
 				int ile_moze_wsiasc = 0, ile_wolnych = 0;
 				for(int i = 0; i < 8; i++)
 					if(!czy_zajete[i]) ile_wolnych++;
+				
 				//dop�ki pasa�er, kt�ry wchodzi pierwszy nie osi�gnie x = 265 to jego x zwi�szka si� o 1 (setWsp) i wy�wietla si� zwi�kszony o 1 (Idz)
+				
+				
 				if (value == 0 && stop == 1 && pietro4) 
 				{
+					wsiada = 1;
 					//dodałem jeden bo nie wiem czemu cos nie dzialalo 
 					if(ile_wolnych >= pietro4) ile_moze_wsiasc = pietro4+1;
 					else ile_moze_wsiasc = ile_wolnych;
-							for(int i = 0; i < pasazer.size(); i++)
+							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, pietro4);
@@ -970,10 +973,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ile_wolnych = 0;
 				for(int i = 0; i < 8; i++)
 					if(!czy_zajete[i]) ile_wolnych++;
+				
 				if (value == 100 && stop == 1 && pietro3) {
+					wsiada = 1;
 					if(ile_wolnych >= pietro3) ile_moze_wsiasc = pietro3+1;
 					else ile_moze_wsiasc = ile_wolnych;
-							for(int i = 0; i < pasazer.size(); i++)
+							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, pietro3);
@@ -1036,10 +1041,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ile_wolnych = 0;
 				for(int i = 0; i < 8; i++)
 					if(!czy_zajete[i]) ile_wolnych++;
+
 				if (value == 200 && stop == 1 && pietro2) {
+					wsiada = 1;
 					if(ile_wolnych >= pietro2) ile_moze_wsiasc = pietro2+1;
 					else ile_moze_wsiasc = ile_wolnych;
-							for(int i = 0; i < pasazer.size(); i++)
+							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, pietro2);
@@ -1102,10 +1109,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ile_wolnych = 0;
 				for(int i = 0; i < 8; i++)
 					if(!czy_zajete[i]) ile_wolnych++;
+				
 				if (value == 300 && stop == 1 && pietro1) {
+					wsiada = 1;
 					if(ile_wolnych >= pietro1) ile_moze_wsiasc = pietro1+1;
 					else ile_moze_wsiasc = ile_wolnych;
-							for(int i = 0; i < pasazer.size(); i++)
+							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, pietro1);
@@ -1168,10 +1177,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ile_wolnych = 0;
 				for(int i = 0; i < 8; i++)
 					if(!czy_zajete[i]) ile_wolnych++;
+
 				if (value == 400 && stop == 1 && pietro0) {
+					wsiada = 1;
 					if(ile_wolnych >= pietro0) ile_moze_wsiasc = pietro0+1;
 					else ile_moze_wsiasc = ile_wolnych;
-							for(int i = 0; i < pasazer.size(); i++)
+							for(unsigned int i = 0; i < pasazer.size(); i++)
 							{
 								if(pasazer[i].czy_w_windzie)
 									pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, pietro0);
@@ -1232,30 +1243,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							}							
 				}
 			}
-			w_windzie =  0;
+			w_windzie = 0;
 			for(int i = 0; i < 8; i++)
 				if(czy_zajete[i]) w_windzie++;
-
+			if (w_windzie == 8)
+				wsiada = 0;
 			int static buf = 0; //do jednorazowego zaktualizowania pozycji
 			
 			//wysiadanie
 			if (pasazer.size()) {
-				//winda zatrzyma si� na pi�trze 3 je�li pasa�er z indeksem 0 chcia� na to pi�tro
 				if (value == 100 && stop == 1) 
 				{ //pietro3
 					//tutaj ta aktualizacja pozycji - musi by�, bo funkcja wy�wietlaj�ca wind� z pasa�erami nie aktualizuje pozycji pasa�er�w
 					if (!buf) { 
-						for (int i = 0; i < pasazer.size(); i++)
+						for (unsigned int i = 0; i < pasazer.size(); i++)
 						{
 							if(pasazer[i].czy_w_windzie)
 								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
 							buf = 1;
 						}
 					}
-					//tutaj w�a�ciwie zaczyna si� wysiadanie - wysiadaj� zawsze wszyscy (trzeba zmieni�)
-					//zmieniam pozycj� x o 1 fukncj� setWsp, a p�niej wy�wietlam funkcj� Idz
-					//robi� to dla ka�dego pasa�era w windzie
-					for (int i = 0; i < pasazer.size(); i++) 
+					
+					for (unsigned int i = 0; i < pasazer.size(); i++)
 					{
 						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro3, w_windzie);
 						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 3 && !pasazer[i].czy_wysiada)
@@ -1300,7 +1309,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						}
 						if(pasazer[i].getWspx() > 450){
 							pasazer[i].czy_w_windzie = false;
-							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+							pasazer[i].czy_wysiada = false;
+							pasazer.erase(pasazer.begin() + i);
 						}
 					}
 					//break;
@@ -1308,14 +1318,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				//to samo tylko dla kolejnych pi�ter
 				if (value == 300 && stop == 1) { //pietro1
 					if (!buf) {
-						for (int i = 0; i < pasazer.size(); i++)
+						for (unsigned int i = 0; i < pasazer.size(); i++)
 						{
 							if(pasazer[i].czy_w_windzie)
 								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
 							buf = 1;
 						}
 					}
-					for (int i = 0; i < pasazer.size(); i++) 
+					for (unsigned int i = 0; i < pasazer.size(); i++)
 					{
 						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro1, w_windzie);
 						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 1 && !pasazer[i].czy_wysiada)
@@ -1360,7 +1370,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						}
 						if(pasazer[i].getWspx() > 450){
 							pasazer[i].czy_w_windzie = false;
-							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+							pasazer[i].czy_wysiada = false;
+							pasazer.erase(pasazer.begin() + i);
 						}
 					}
 
@@ -1368,14 +1379,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 				if (value == 200 && stop == 1) { //pietro2
 					if (!buf) { 
-						for (int i = 0; i < pasazer.size(); i++)
+						for (unsigned int i = 0; i < pasazer.size(); i++)
 						{
 							if(pasazer[i].czy_w_windzie)
 								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
 							buf = 1;
 						}
 					}
-					for (int i = 0; i < pasazer.size(); i++) 
+					for (unsigned int i = 0; i < pasazer.size(); i++)
 					{
 						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro2, w_windzie);
 						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 2 && !pasazer[i].czy_wysiada)
@@ -1420,21 +1431,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						}
 						if(pasazer[i].getWspx() < 3){
 							pasazer[i].czy_w_windzie = false;
-							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+							pasazer[i].czy_wysiada = false;
+							pasazer.erase(pasazer.begin() + i);
 						}
 					}
 					//break;
 				}
 				if (value == 400 && stop == 1) { //pietro0
 					if (!buf) { 
-						for (int i = 0; i < pasazer.size(); i++)
+						for (unsigned int i = 0; i < pasazer.size(); i++)
 						{
 							if(pasazer[i].czy_w_windzie)
 								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
 							buf = 1;
 						}
 					}
-					for (int i = 0; i < pasazer.size(); i++) 
+					for (unsigned int i = 0; i < pasazer.size(); i++)
 					{
 						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro0, w_windzie);
 						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 0 && !pasazer[i].czy_wysiada)
@@ -1479,20 +1491,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						}
 						if(pasazer[i].getWspx() < 3){
 							pasazer[i].czy_w_windzie = false;
-							pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+							pasazer[i].czy_wysiada = false;
+							pasazer.erase(pasazer.begin() + i);
 						}
 					}
 				}
 				if (value == 0 && stop == 1) { //pietro4
 					if (!buf) { 
-						for (int i = 0; i < pasazer.size(); i++)
+						for (unsigned int i = 0; i < pasazer.size(); i++)
 						{
 							if(pasazer[i].czy_w_windzie)
 								pasazer[i].setWsp(pasazer[i].getWspx(), value + 55);
 							buf = 1;
 						}
 					}
-					for (int i = 0; i < pasazer.size(); i++) 
+					for (unsigned int i = 0; i < pasazer.size(); i++)
 					{
 						if(pasazer[i].czy_w_windzie) pasazer[i].Idz(hWnd, hdc, ps, &drawArea_pietro4, w_windzie);
 						if(pasazer[i].czy_w_windzie && pasazer[i].getDokad() == 4 && !pasazer[i].czy_wysiada) 
@@ -1538,14 +1551,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 							if(pasazer[i].getWspx() < 3)
 							{
 								pasazer[i].czy_w_windzie = false;
-								pasazer[i].setWsp(pasazer[i].getWspx(), 600);
+								pasazer[i].czy_wysiada = false;
+								pasazer.erase(pasazer.begin() + i);
 							}
 					}
 				}
 			}
+			
+			poszedl = 1;
+
+			for (unsigned int i = 0; i < pasazer.size(); i++)
+				if (pasazer[i].czy_wysiada) {
+					poszedl = 0;
+					break;
+				}
+			if (wsiada)
+				poszedl = 0;
 
 			//je�li winda stoi, to ruszy po 3 sekundach je�li b�dzie mia�a kolejne pi�tro na kt�re ma jecha�
-			if (GetTickCount64() - ktory_tick >= 5000 && !w_ruchu && na_ktore.size()) {
+			if (GetTickCount64() - ktory_tick >= 3000 && !w_ruchu && na_ktore.size() && poszedl) {
 				if (na_ktore[0] * 100 > 400 - value)
 					w_gore = 1;
 				if (na_ktore[0] * 100 < 400 - value)
@@ -1560,134 +1584,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				else 
 				{
 					czy_pusta = false;
-					break;
 				}
 			}
-			// tu kacpra odnosnie w_windzie
 
-			//jesli pasazer z 4 pietra dojdzie do wspolrzednej x = 265 i jest z tego pietra to zwieksza sie liczba osob w windzie
-			//to nadal chyba nie dzia�a poprawnie, wi�c daj� tylko, �e liczba pasa�er�w og�lnie na mapie to liczba os�b w windzie
-			// if(pasazer.size())
-			// 	if (pasazer[0].getWspx() == 265 && pasazer[0].getSkad() == 4 - value / 100 && value == 0) {
-			// 		w_windzie++;		//powinno dzialac, ale za duzo dodaje (bo za duzo sie odpala), trzeba dodac jakies warunki
-			// 		w_windzie = pasazer.size(); //dziala tylko jak wsiada wszyscy z 4 pietra
-			// 	}
+			bool dodaj = false;
+			int kolejne_pietro = 0;
 
-			//jesli winda ma value = 0 (0 pikseli w dol), czyli jest na 4 pietrze i pasazerowie wejd� do windy to liczba os�b na pietrze 4 = 0
-			// if (value == 0 && w_windzie) {
-			// 	//pietro4 = 0;
-			// 	if (na_ktore.size())
-			// 		if(na_ktore[0] == 4) //tutaj usuwam pi�tro 4 z kolejki, na kt�re ma jecha� winda, bo ju� tutaj jest
-			// 			na_ktore.erase(na_ktore.begin());
-
-				//usuwam powtarzaj�ce si� elementy w kolejce pi�ter na kt�re ma jecha� winda (bo jak kilka os�b chce jecha� na te same to
-				//ka�de klikni�cie dodaje te pi�tro do kolejki, a wystraczy, �eby by�o tylko raz
-				bool dodaj = false;
-				int kolejne_pietro = 0;
-				auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
-				na_ktore.erase(uniqueEnd, na_ktore.end());
-				std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
-				int ile_wolnych = 0;
-				for(int i = 0; i < 8; i++)
-					if(!czy_zajete[i]) ile_wolnych++;
-				if(ile_wolnych)
-				{
-					if(w_gore)
-					{
-							for(int i = 0; i < pasazer.size(); i++)
-							{
-								if(pasazer[i].getSkad() < na_ktore[0] && !pasazer[i].czy_w_windzie && pasazer[i].getDokad() > pasazer[i].getSkad())
-								{
-									dodaj = true;
-									kolejne_pietro = pasazer[i].getSkad();
-								}
-							}
-							if(dodaj) na_ktore.insert(na_ktore.begin(), kolejne_pietro);
-					}
-					else 
-					{
-						for(int i = 0; i < pasazer.size(); i++)
-						{
-							if(pasazer[i].getSkad() > na_ktore[0] && !pasazer[i].czy_w_windzie && pasazer[i].getDokad() < pasazer[i].getSkad())
-							{
-								dodaj = true;
-								kolejne_pietro = pasazer[i].getSkad();
-							}
-						}
-						if(dodaj) na_ktore.insert(na_ktore.begin(), kolejne_pietro);
-					}
-				}
-
-				//sortuj� malej�ca, bo winda jedzie w d� (b�dzie trzeba to uzale�ni� od tego czy jedzie w g�r�, wtedy trzeba inaczej sortowa�)
-				//a sortuj� po to, �eby zje�d�aj�c w d� odwiedza� pi�tra po kolei, np. 3,1,0, zamiast 1,0,3, bo przed sortowaniem
-				//kolejno�� jest ustalona przez klikni�cia przycisku, na kt�re chce jecha�
-				//if(!w_gore)
-					//std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
-				//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
-			// }
-			// if(value == 100 && w_windzie)
-			// {
-			// 	//pietro3 = 0;
-			// 	if(na_ktore.size())
-			// 		if(na_ktore[0] == 3)
-			// 			na_ktore.erase(na_ktore.begin());
-			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
-			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
-			// 	//if(!w_gore)
-			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
-			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
-			// }
-			// if(value == 200 && w_windzie)
-			// {
-			// 	//pietro3 = 0;
-			// 	if(na_ktore.size())
-			// 		if(na_ktore[0] == 2)
-			// 			na_ktore.erase(na_ktore.begin());
-			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
-			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
-			// 	//if(!w_gore)
-			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
-			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
-			// }
-			// if(value == 300 && w_windzie)
-			// {
-			// 	//pietro3 = 0;
-			// 	if(na_ktore.size())
-			// 		if(na_ktore[0] == 1)
-			// 			na_ktore.erase(na_ktore.begin());
-			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
-			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
-			// 	//if(!w_gore)
-			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
-			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
-			// }
-			// if(value == 400 && w_windzie)
-			// {
-			// 	//pietro3 = 0;
-			// 	if(na_ktore.size())
-			// 		if(na_ktore[0] == 0)
-			// 			na_ktore.erase(na_ktore.begin());
-			// 	auto uniqueEnd = std::unique(na_ktore.begin(), na_ktore.end()); 
-			// 	na_ktore.erase(uniqueEnd, na_ktore.end());
-			// 	//if(!w_gore)
-			// 		std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return a > b;});
-			// 	//else std::sort(na_ktore.begin(), na_ktore.end(), [](int a, int b) {return b > a;});
-			// }
+			int ile_wolnych = 0;
+			for(int i = 0; i < 8; i++)
+				if(!czy_zajete[i]) ile_wolnych++;
 
 			//to jest zeby jak winda stoi, to nie aktualizowac okienka, zeby nie migalo
 			if (stop)
 				break;
-
 			//tutaj to zmieniam, bo po tym jak winda ruszy, czyli stop = 0 (nie bedzie tego break wyzej)
 			buf = 0;
-
 
 			if (!w_gore)
 				value++;
 			else
 				value--;
 			
-				
 			repaintWindow(hWnd, hdc, ps, &drawArea1, w_windzie, czy_zajete);
 			
 			break;
@@ -1696,7 +1613,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-	//return 0;
+	return 0;
 }
 
 // Message handler for about box.
