@@ -1,8 +1,7 @@
 # Symulacja windy
 
 Program wizualizujący działanie windy
-![screen](https://github.com/jwszol-classes/tp2023-s193369/assets/134955266/9a6befad-bc97-41ea-8683-7966dbc4f05e)
-
+![screen](https://github.com/jwszol-classes/tp2023-s193369/assets/134955266/26de768c-62e1-4eae-aabb-4bf99c2e4969)
 ## Podział pracy
 ##### Kacper:
 - kolejkowanie pięter 
